@@ -8,16 +8,22 @@ const App = () => {
   const [fetchOn, setFetchOn] = useState(false);
   const [dataGot, setDataGot] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // New loading state
 
   const fetchData = async () => {
+    setLoading(true); // Start loading
     try {
       const response = await Axios.get('https://reqres.in/api/users');
-      setApiData(response.data.data);
-      setDataGot(true);
-      console.log(response.data.data);
+      if (response.data.data.length === 0) {
+        setError("No data found to display.");
+      } else {
+        setApiData(response.data.data);
+        setDataGot(true);
+      }
     } catch (error) {
-      console.error(error);
       setError("No data found to display.");
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -76,16 +82,19 @@ const App = () => {
           Get User List
         </button>
       </nav>
-      <table id="table">
-        <tbody id="tbody">
-          <tr className="tr">
-            <th className="th" id="firstName">First Name</th>
-            <th className="th" id="lastName">Last Name</th>
-            <th className="th" id="email">Email</th>
-            <th className="th" id="avatar">Avatar</th>
-          </tr>
-          {dataGot &&
-            apiData.map((data) => (
+
+      {loading && <h3>Loading...</h3>} {/* Loading feedback */}
+
+      {!loading && dataGot && (
+        <table id="table">
+          <tbody id="tbody">
+            <tr className="tr">
+              <th className="th" id="firstName">First Name</th>
+              <th className="th" id="lastName">Last Name</th>
+              <th className="th" id="email">Email</th>
+              <th className="th" id="avatar">Avatar</th>
+            </tr>
+            {apiData.map((data) => (
               <tr className="tr" key={data.id}>
                 <td className="td" id="firstName">{data.first_name}</td>
                 <td className="td" id="lastName">{data.last_name}</td>
@@ -95,10 +104,12 @@ const App = () => {
                 </td>
               </tr>
             ))}
-        </tbody>
-      </table>
-      {!dataGot && fetchOn && <h3 id="noData">{error}</h3>}
-      {!fetchOn && <h3 id="noData">No data found</h3>}
+          </tbody>
+        </table>
+      )}
+
+      {!loading && !dataGot && fetchOn && <h3 id="noData">{error}</h3>}
+      {!loading && !fetchOn && <h3 id="noData">No data found</h3>}
     </div>
   );
 };
