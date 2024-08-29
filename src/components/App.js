@@ -8,10 +8,10 @@ const App = () => {
   const [fetchOn, setFetchOn] = useState(false);
   const [dataGot, setDataGot] = useState(false);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false); // New loading state
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       const response = await Axios.get('https://reqres.in/api/users');
       if (response.data.data.length === 0) {
@@ -19,11 +19,12 @@ const App = () => {
       } else {
         setApiData(response.data.data);
         setDataGot(true);
+        setError(null); // Clear error if data is present
       }
     } catch (error) {
       setError("No data found to display.");
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
@@ -83,17 +84,21 @@ const App = () => {
         </button>
       </nav>
 
-      {loading && <h3>Loading...</h3>} {/* Loading feedback */}
+      {loading && <h3>Loading...</h3>}
 
-      {!loading && dataGot && (
+      {!loading && !dataGot && fetchOn && <h3 id="noData">{error || "No data found"}</h3>}
+
+      {dataGot && !loading && (
         <table id="table">
-          <tbody id="tbody">
+          <thead>
             <tr className="tr">
               <th className="th" id="firstName">First Name</th>
               <th className="th" id="lastName">Last Name</th>
               <th className="th" id="email">Email</th>
               <th className="th" id="avatar">Avatar</th>
             </tr>
+          </thead>
+          <tbody id="tbody">
             {apiData.map((data) => (
               <tr className="tr" key={data.id}>
                 <td className="td" id="firstName">{data.first_name}</td>
@@ -107,9 +112,6 @@ const App = () => {
           </tbody>
         </table>
       )}
-
-      {!loading && !dataGot && fetchOn && <h3 id="noData">{error}</h3>}
-      {!loading && !fetchOn && <h3 id="noData">No data found</h3>}
     </div>
   );
 };
