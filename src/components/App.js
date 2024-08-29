@@ -86,9 +86,7 @@ const App = () => {
 
       {loading && <h3>Loading...</h3>}
 
-      {!loading && !dataGot && fetchOn && <h3 id="noData">{error || "No data found"}</h3>}
-
-      {dataGot && !loading && (
+      {(
         <table id="table">
           <thead>
             <tr className="tr">
@@ -97,8 +95,9 @@ const App = () => {
               <th className="th" id="email">Email</th>
               <th className="th" id="avatar">Avatar</th>
             </tr>
+          {!dataGot && <tr id="noData"><td colSpan="4"><h3>{ error || "No data found"}</h3></td></tr>}
           </thead>
-          <tbody id="tbody">
+          {dataGot && !loading && (<tbody id="tbody">
             {apiData.map((data) => (
               <tr className="tr" key={data.id}>
                 <td className="td" id="firstName">{data.first_name}</td>
@@ -109,7 +108,8 @@ const App = () => {
                 </td>
               </tr>
             ))}
-          </tbody>
+          </tbody>)
+          }
         </table>
       )}
     </div>
